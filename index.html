@@ -7,6 +7,16 @@
     <title>Flores amarillas</title>
     <meta name="description" content="Un ramo de flores amarillas que crece en pantalla, con un mensaje para alguien especial." />
     <meta name="theme-color" content="#0b1114" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_GT" />
+    <meta property="og:title" content="Te llegaron unas flores amarillas" />
+    <meta property="og:description" content="Abre la carta y mira cómo crece el ramo." />
+    <meta property="og:url" content="https://said1ojeda.github.io/FloresAmarillas/" />
+    <meta property="og:image" content="https://said1ojeda.github.io/FloresAmarillas/docs/vista.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
@@ -1858,10 +1868,155 @@ body {
   opacity: 1;
 }
 
+/* en el cel la pista va arriba de los botones para que no se encimen */
 @media (max-width: 600px) {
   .pista {
-    left: 16px;
-    transform: none;
+    bottom: calc(clamp(12px, 3vw, 28px) + 58px);
+  }
+}
+
+/* el ramo se achica cuando la pantalla es baja, asi el mensaje nunca le queda encima */
+.flowers {
+  transform: scale(var(--escala, 1));
+  transition: transform .6s ease;
+}
+
+/* panel para armar tu propio ramo */
+.crear {
+  width: min(92vw, 420px);
+  margin: auto;
+  padding: 28px 24px 24px;
+  border: 1px solid rgba(255, 236, 153, .25);
+  border-radius: 20px;
+  color: #fff6d5;
+  background: rgba(12, 20, 22, .92);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .7);
+}
+
+.crear::backdrop {
+  background: rgba(0, 0, 0, .55);
+  backdrop-filter: blur(4px);
+}
+
+.crear[open] {
+  animation: carta-entra .5s cubic-bezier(.2, .9, .3, 1.2) both;
+}
+
+.crear h2 {
+  font-family: 'Dancing Script', cursive;
+  font-size: 2rem;
+  color: #ffe680;
+}
+
+.crear__ayuda {
+  margin: .2em 0 1.1em;
+  font-size: .85rem;
+  color: rgba(255, 246, 213, .65);
+}
+
+.crear label {
+  display: block;
+  margin-top: 12px;
+  font-size: .75rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255, 236, 153, .75);
+}
+
+.crear input,
+.crear textarea {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 236, 153, .2);
+  border-radius: 10px;
+  font: 400 .95rem 'Poppins', system-ui, sans-serif;
+  color: #fff6d5;
+  background: rgba(255, 255, 255, .05);
+  resize: none;
+}
+
+.crear input:focus,
+.crear textarea:focus {
+  outline: none;
+  border-color: #ffd84a;
+  box-shadow: 0 0 0 3px rgba(255, 216, 74, .2);
+}
+
+.crear__cuenta {
+  margin-top: 4px;
+  font-size: .7rem;
+  text-align: right;
+  color: rgba(255, 246, 213, .45);
+}
+
+.crear__enlace {
+  font-size: .8rem !important;
+  color: rgba(255, 246, 213, .8) !important;
+}
+
+.crear__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.crear__acciones .boton {
+  flex: 1 1 140px;
+  margin: 0;
+  padding: 11px 18px;
+  font-size: .9rem;
+}
+
+.boton--suave {
+  color: #ffe680;
+  background: transparent;
+  border: 1px solid rgba(255, 236, 153, .4);
+  box-shadow: none;
+}
+
+.boton--suave:hover {
+  box-shadow: none;
+  background: rgba(255, 214, 64, .1);
+}
+
+.crear__cerrar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: rgba(255, 246, 213, .6);
+  background: transparent;
+  cursor: pointer;
+}
+
+.crear__cerrar:hover {
+  color: #fff6d5;
+  background: rgba(255, 255, 255, .08);
+}
+
+.crear__aviso {
+  min-height: 1.2em;
+  margin-top: 10px;
+  font-size: .8rem;
+  text-align: center;
+  color: #ffe680;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flowers {
+    transition: none;
+  }
+
+  .crear[open] {
+    animation: none;
   }
 }
 
@@ -2197,6 +2352,11 @@ body {
     <canvas id="cielo" aria-hidden="true"></canvas>
 
     <div class="controles" id="controles">
+      <button class="control" id="abrirCrear" type="button" aria-label="Crea tu propio ramo" title="Crea tu propio ramo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/>
+        </svg>
+      </button>
       <button class="control" id="reflorecer" type="button" aria-label="Volver a florecer" title="Volver a florecer">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>
@@ -2210,6 +2370,26 @@ body {
       </button>
     </div>
     <p class="pista" aria-hidden="true">toca la pantalla para soltar pétalos</p>
+
+    <dialog class="crear" id="crear" aria-labelledby="crearTitulo">
+      <button class="crear__cerrar" id="cerrarCrear" type="button" aria-label="Cerrar">&times;</button>
+      <h2 id="crearTitulo">Crea tu propio ramo</h2>
+      <p class="crear__ayuda">Escribe para quién es y tu mensaje, te armo un enlace para mandárselo.</p>
+      <label for="campoPara">Para</label>
+      <input id="campoPara" maxlength="40" autocomplete="off" placeholder="Su nombre" />
+      <label for="campoDe">De</label>
+      <input id="campoDe" maxlength="40" autocomplete="off" placeholder="Tu nombre" />
+      <label for="campoMensaje">Mensaje</label>
+      <textarea id="campoMensaje" maxlength="160" rows="3" placeholder="Unas flores amarillas para alegrarte el día"></textarea>
+      <p class="crear__cuenta" id="cuentaMensaje">0 / 160</p>
+      <label for="campoEnlace">Enlace</label>
+      <input class="crear__enlace" id="campoEnlace" readonly />
+      <div class="crear__acciones">
+        <button class="boton" id="copiar" type="button">Copiar enlace</button>
+        <button class="boton boton--suave" id="compartir" type="button" hidden>Compartir</button>
+      </div>
+      <p class="crear__aviso" id="avisoCrear" role="status"></p>
+    </dialog>
 
     <script>
       // el mensaje se arma con el enlace, por ejemplo ?para=Ana&de=Said&mensaje=Feliz cumple
@@ -2498,6 +2678,125 @@ body {
         document.getElementById('controles').classList.add('visible');
         setTimeout(() => soltarPetalos(ancho / 2, alto * 0.4, 30), 5200);
       }, { once: true });
+
+      // sin movimiento el cielo queda quieto, solo se pintan las estrellas una vez
+      if (sinMovimiento) {
+        for (const e of estrellas) {
+          ctx.globalAlpha = 0.4 + Math.random() * 0.6;
+          ctx.fillStyle = '#e8fbff';
+          ctx.beginPath();
+          ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      // se mide el ramo ya crecido en una copia escondida y se achica lo justo para que quepa bajo el mensaje
+      function ajustarRamo() {
+        const ramo = document.querySelector('.flowers');
+        const encabezado = document.querySelector('.mensaje');
+        const escrito = texto.textContent;
+        texto.textContent = mensaje;
+        const techo = encabezado.getBoundingClientRect().bottom + 14;
+        texto.textContent = escrito;
+
+        // la copia va encima del original, en el mismo lugar y del mismo tamaño
+        const base = ramo.getBoundingClientRect();
+        const copia = ramo.cloneNode(true);
+        copia.style.cssText = 'visibility:hidden;position:fixed;margin:0;transition:none;--escala:1;pointer-events:none' +
+          ';left:' + base.left + 'px;top:' + base.top + 'px;width:' + base.width + 'px;height:' + base.height + 'px';
+        copia.setAttribute('aria-hidden', 'true');
+        document.body.append(copia);
+        // las que se repiten siempre no se pueden terminar, esas se quitan
+        copia.getAnimations({ subtree: true }).forEach(a => {
+          try { a.finish(); } catch (e) { a.cancel(); }
+        });
+        let arriba = Infinity, abajo = 0;
+        copia.querySelectorAll('.flower__leaf').forEach(el => { arriba = Math.min(arriba, el.getBoundingClientRect().top); });
+        copia.querySelectorAll('.flower__line').forEach(el => { abajo = Math.max(abajo, el.getBoundingClientRect().bottom); });
+        copia.remove();
+        if (!isFinite(arriba) || abajo <= arriba) return;
+
+        const escala = Math.max(0.5, Math.min(1, (abajo - techo) / (abajo - arriba)));
+        ramo.style.transformOrigin = '50% ' + Math.round(abajo - base.top) + 'px';
+        ramo.style.setProperty('--escala', escala.toFixed(3));
+      }
+
+      ajustarRamo();
+      let esperaMedida = null;
+      addEventListener('resize', () => {
+        clearTimeout(esperaMedida);
+        esperaMedida = setTimeout(ajustarRamo, 150);
+      });
+      if (document.fonts) document.fonts.ready.then(ajustarRamo);
+
+      // al reflorecer el ramo nuevo tambien lleva su tamaño
+      document.getElementById('reflorecer').addEventListener('click', ajustarRamo);
+
+      // armar un enlace con otro nombre y otro mensaje para mandarselo a alguien
+      const crear = document.getElementById('crear');
+      const campos = {
+        para: document.getElementById('campoPara'),
+        de: document.getElementById('campoDe'),
+        mensaje: document.getElementById('campoMensaje')
+      };
+      const enlace = document.getElementById('campoEnlace');
+      const avisoCrear = document.getElementById('avisoCrear');
+      const cuenta = document.getElementById('cuentaMensaje');
+      const botonCompartir = document.getElementById('compartir');
+
+      function armarEnlace() {
+        const datos = new URLSearchParams();
+        for (const [clave, campo] of Object.entries(campos)) {
+          const valor = campo.value.trim();
+          if (valor) datos.set(clave, valor);
+        }
+        const base = location.href.split(/[?#]/)[0];
+        const consulta = datos.toString();
+        enlace.value = consulta ? base + '?' + consulta : base;
+        cuenta.textContent = campos.mensaje.value.length + ' / 160';
+        avisoCrear.textContent = '';
+      }
+
+      // la primera vez se llena con lo del enlace, despues se respeta lo que ya escribiste
+      let yaLleno = false;
+      document.getElementById('abrirCrear').addEventListener('click', () => {
+        if (!yaLleno) {
+          campos.para.value = para;
+          campos.de.value = parametros.get('de') ? de : '';
+          campos.mensaje.value = parametros.get('mensaje') ? mensaje : '';
+          yaLleno = true;
+        }
+        armarEnlace();
+        crear.showModal();
+        campos.para.focus();
+      });
+      document.getElementById('cerrarCrear').addEventListener('click', () => crear.close());
+      // tocar fuera del panel tambien lo cierra
+      crear.addEventListener('click', e => { if (e.target === crear) crear.close(); });
+      Object.values(campos).forEach(c => c.addEventListener('input', armarEnlace));
+
+      document.getElementById('copiar').addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(enlace.value);
+        } catch (e) {
+          enlace.select();
+          document.execCommand('copy');
+        }
+        avisoCrear.textContent = 'Enlace copiado, ya lo puedes pegar donde quieras';
+      });
+
+      if (navigator.share) {
+        botonCompartir.hidden = false;
+        botonCompartir.addEventListener('click', () => {
+          const nombre = campos.para.value.trim();
+          navigator.share({
+            title: 'Flores amarillas',
+            text: nombre ? 'Unas flores amarillas para ' + nombre : 'Unas flores amarillas para ti',
+            url: enlace.value
+          }).catch(() => {});
+        });
+      }
     </script>
   </body>
 </html>
