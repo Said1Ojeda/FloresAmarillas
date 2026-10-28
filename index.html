@@ -4,7 +4,22 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dev. said - Flores amarillas</title>
+    <title>Flores amarillas</title>
+    <meta name="description" content="Un ramo de flores amarillas que crece en pantalla, con un mensaje para alguien especial." />
+    <meta name="theme-color" content="#0b1114" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_GT" />
+    <meta property="og:title" content="Te llegaron unas flores amarillas" />
+    <meta property="og:description" content="Abre la carta y mira cómo crece el ramo." />
+    <meta property="og:url" content="https://said1ojeda.github.io/FloresAmarillas/" />
+    <meta property="og:image" content="https://said1ojeda.github.io/FloresAmarillas/docs/vista.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
     <style>
       *,
 *::after,
@@ -32,28 +47,6 @@ body {
   overflow: hidden;
 }
 
-
-.titulo {
-  margin-bottom: 180px;
-  color: whitesmoke;
-  position: absolute;
-  top: 20px; 
-  left: 50%;
-  transform: translateX(-50%); 
-  width: 80%;
-  font-size: 3vh;
-  opacity: 0;
-  animation: fadeIn 4s ease-in-out forwards;
-  text-align: center;
-}
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
 
 .night {
   z-index: -1;
@@ -1601,53 +1594,450 @@ body {
   }
 }
 
-body, h1, p {
-  margin: 0;
-  padding: 0;
+/* mientras la carta esta cerrada las flores esperan, al abrirla crecen desde cero */
+body.esperando .flowers,
+body.esperando .flowers * {
+  animation-play-state: paused !important;
 }
 
 body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f7f7f7;
-  color: #333;
+  font-family: 'Poppins', system-ui, sans-serif;
+  color: #f5f5f5;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+/* el mensaje de arriba, se escribe letra por letra */
+.mensaje {
+  position: absolute;
+  top: clamp(16px, 5vh, 48px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(92vw, 760px);
+  text-align: center;
+  z-index: 20;
+  pointer-events: none;
 }
 
-h1 {
-  font-size: 2em;
-  line-height: 1.5;
-  margin-bottom: 20px;
+.mensaje__para {
+  font-size: clamp(.8rem, 2.2vw, 1rem);
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: rgba(255, 236, 153, .8);
+  opacity: 0;
+  transition: opacity 1.2s ease;
 }
 
-@media screen and (max-width: 600px) {
-  h1 {
-      font-size: 1.5em;
+.mensaje__texto {
+  margin-top: .3em;
+  font-family: 'Dancing Script', cursive;
+  font-weight: 700;
+  font-size: clamp(1.7rem, 5.2vw, 3.2rem);
+  line-height: 1.2;
+  color: #fff6d5;
+  text-shadow: 0 0 18px rgba(255, 214, 64, .45), 0 2px 6px rgba(0, 0, 0, .6);
+  min-height: 1.2em;
+}
+
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: .9em;
+  margin-left: 4px;
+  vertical-align: -0.08em;
+  background: #ffd84a;
+  opacity: 0;
+}
+
+.escribiendo .cursor {
+  opacity: 1;
+  animation: parpadeo .8s steps(1) infinite;
+}
+
+@keyframes parpadeo {
+  50% { opacity: 0; }
+}
+
+.mensaje__firma {
+  margin-top: .6em;
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(1rem, 2.6vw, 1.4rem);
+  color: rgba(255, 246, 213, .75);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 1.2s ease, transform 1.2s ease;
+}
+
+.visible {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* la carta de entrada */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(ellipse at center, rgba(20, 30, 34, .92), rgba(0, 0, 0, .97));
+  backdrop-filter: blur(6px);
+  transition: opacity .9s ease, visibility .9s ease;
+}
+
+.intro.cerrando {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.carta {
+  position: relative;
+  width: min(88vw, 380px);
+  padding: 56px 28px 32px;
+  border-radius: 22px;
+  text-align: center;
+  background: linear-gradient(160deg, #fffaf0, #fbefd2);
+  color: #3a2f1d;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .6), 0 0 0 1px rgba(255, 255, 255, .5) inset;
+  animation: carta-entra 1s cubic-bezier(.2, .9, .3, 1.2) both;
+}
+
+@keyframes carta-entra {
+  from { opacity: 0; transform: translateY(30px) scale(.94); }
+}
+
+.carta__sello {
+  position: absolute;
+  top: -26px;
+  left: 50%;
+  width: 52px;
+  height: 52px;
+  margin-left: -26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffe680, #f2b705 60%, #c98a00);
+  box-shadow: 0 6px 18px rgba(242, 183, 5, .55);
+}
+
+/* cinco petalos en el sello, hechos con sombras de un circulo */
+.carta__sello::after {
+  content: '';
+  position: absolute;
+  inset: 18px;
+  border-radius: 50%;
+  background: #8a5a00;
+  box-shadow: 0 -9px 0 1px #fff3b0, 8.5px -3px 0 1px #fff3b0, 5px 7.5px 0 1px #fff3b0,
+              -5px 7.5px 0 1px #fff3b0, -8.5px -3px 0 1px #fff3b0;
+}
+
+.carta__aviso {
+  font-size: .78rem;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: #a07c2c;
+}
+
+.carta__titulo {
+  margin: .25em 0 .1em;
+  font-family: 'Dancing Script', cursive;
+  font-size: 2.6rem;
+  line-height: 1.1;
+  word-break: break-word;
+}
+
+.carta__de {
+  min-height: 1.4em;
+  font-size: .95rem;
+  color: #7a6640;
+}
+
+.boton {
+  margin-top: 22px;
+  padding: 12px 34px;
+  border: 0;
+  border-radius: 999px;
+  font: 600 1rem 'Poppins', system-ui, sans-serif;
+  color: #3a2a00;
+  background: linear-gradient(180deg, #ffe066, #f4b400);
+  box-shadow: 0 10px 24px rgba(244, 180, 0, .45);
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.boton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(244, 180, 0, .55);
+}
+
+.boton:active {
+  transform: translateY(1px);
+}
+
+.boton:focus-visible {
+  outline: 3px solid #fff3b0;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carta,
+  .escribiendo .cursor {
+    animation: none;
   }
 }
 
-@media screen and (min-width: 601px) and (max-width: 1024px) {
-  h1 {
-      font-size: 1.8em;
+/* el canvas del cielo va encima de todo pero no estorba los clics */
+#cielo {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* botones redondos abajo a la derecha, salen hasta que se abre la carta */
+.controles {
+  position: fixed;
+  right: clamp(12px, 3vw, 28px);
+  bottom: clamp(12px, 3vw, 28px);
+  z-index: 30;
+  display: flex;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 1s ease 3s, transform 1s ease 3s;
+}
+
+.control {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255, 236, 153, .35);
+  border-radius: 50%;
+  color: #ffe680;
+  background: rgba(10, 18, 20, .55);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease, border-color .2s ease;
+}
+
+.control:hover {
+  background: rgba(255, 214, 64, .18);
+  border-color: rgba(255, 236, 153, .7);
+  transform: translateY(-2px);
+}
+
+.control:focus-visible {
+  outline: 2px solid #ffe680;
+  outline-offset: 3px;
+}
+
+.control svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* con la musica apagada la nota sale tachada */
+.control .tachado {
+  display: none;
+}
+
+.control.apagado .tachado {
+  display: inline;
+}
+
+.control.apagado {
+  color: rgba(255, 230, 128, .55);
+}
+
+.pista {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(10px, 2.5vh, 22px);
+  transform: translateX(-50%);
+  z-index: 30;
+  font-size: .75rem;
+  letter-spacing: .08em;
+  color: rgba(255, 246, 213, .55);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.5s ease 9s;
+}
+
+.controles.visible + .pista {
+  opacity: 1;
+}
+
+/* en el cel la pista va arriba de los botones para que no se encimen */
+@media (max-width: 600px) {
+  .pista {
+    bottom: calc(clamp(12px, 3vw, 28px) + 58px);
   }
 }
 
-@media screen and (min-width: 1025px) {
-  h1 {
-      font-size: 2em;
-  }
+/* el ramo se achica cuando la pantalla es baja, asi el mensaje nunca le queda encima */
+.flowers {
+  transform: scale(var(--escala, 1));
+  transition: transform .6s ease;
 }
 
+/* panel para armar tu propio ramo */
+.crear {
+  width: min(92vw, 420px);
+  margin: auto;
+  padding: 28px 24px 24px;
+  border: 1px solid rgba(255, 236, 153, .25);
+  border-radius: 20px;
+  color: #fff6d5;
+  background: rgba(12, 20, 22, .92);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .7);
+}
+
+.crear::backdrop {
+  background: rgba(0, 0, 0, .55);
+  backdrop-filter: blur(4px);
+}
+
+.crear[open] {
+  animation: carta-entra .5s cubic-bezier(.2, .9, .3, 1.2) both;
+}
+
+.crear h2 {
+  font-family: 'Dancing Script', cursive;
+  font-size: 2rem;
+  color: #ffe680;
+}
+
+.crear__ayuda {
+  margin: .2em 0 1.1em;
+  font-size: .85rem;
+  color: rgba(255, 246, 213, .65);
+}
+
+.crear label {
+  display: block;
+  margin-top: 12px;
+  font-size: .75rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255, 236, 153, .75);
+}
+
+.crear input,
+.crear textarea {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 236, 153, .2);
+  border-radius: 10px;
+  font: 400 .95rem 'Poppins', system-ui, sans-serif;
+  color: #fff6d5;
+  background: rgba(255, 255, 255, .05);
+  resize: none;
+}
+
+.crear input:focus,
+.crear textarea:focus {
+  outline: none;
+  border-color: #ffd84a;
+  box-shadow: 0 0 0 3px rgba(255, 216, 74, .2);
+}
+
+.crear__cuenta {
+  margin-top: 4px;
+  font-size: .7rem;
+  text-align: right;
+  color: rgba(255, 246, 213, .45);
+}
+
+.crear__enlace {
+  font-size: .8rem !important;
+  color: rgba(255, 246, 213, .8) !important;
+}
+
+.crear__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.crear__acciones .boton {
+  flex: 1 1 140px;
+  margin: 0;
+  padding: 11px 18px;
+  font-size: .9rem;
+}
+
+.boton--suave {
+  color: #ffe680;
+  background: transparent;
+  border: 1px solid rgba(255, 236, 153, .4);
+  box-shadow: none;
+}
+
+.boton--suave:hover {
+  box-shadow: none;
+  background: rgba(255, 214, 64, .1);
+}
+
+.crear__cerrar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: rgba(255, 246, 213, .6);
+  background: transparent;
+  cursor: pointer;
+}
+
+.crear__cerrar:hover {
+  color: #fff6d5;
+  background: rgba(255, 255, 255, .08);
+}
+
+.crear__aviso {
+  min-height: 1.2em;
+  margin-top: 10px;
+  font-size: .8rem;
+  text-align: center;
+  color: #ffe680;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flowers {
+    transition: none;
+  }
+
+  .crear[open] {
+    animation: none;
+  }
+}
 
     </style>
   </head>
-  <body class="container">
-    <h1 class="titulo">
-      Text Said</h1>
+  <body class="esperando">
+    <header class="mensaje" aria-live="polite">
+      <p class="mensaje__para" id="para"></p>
+      <h1 class="mensaje__texto"><span id="texto"></span><span class="cursor" aria-hidden="true"></span></h1>
+      <p class="mensaje__firma" id="firma"></p>
+    </header>
+
+    <div class="intro" id="intro" role="dialog" aria-labelledby="introTitulo">
+      <div class="carta">
+        <div class="carta__sello" aria-hidden="true"></div>
+        <p class="carta__aviso">Te llegó algo</p>
+        <h2 class="carta__titulo" id="introTitulo">Para ti</h2>
+        <p class="carta__de" id="introDe"></p>
+        <button class="boton" id="abrir" type="button">Abrir</button>
+      </div>
+    </div>
   
     <div class="night"></div>
     <div class="flowers">
@@ -1959,13 +2349,454 @@ h1 {
         </div>
       </div>
     </div>
+    <canvas id="cielo" aria-hidden="true"></canvas>
+
+    <div class="controles" id="controles">
+      <button class="control" id="abrirCrear" type="button" aria-label="Crea tu propio ramo" title="Crea tu propio ramo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/>
+        </svg>
+      </button>
+      <button class="control" id="reflorecer" type="button" aria-label="Volver a florecer" title="Volver a florecer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>
+        </svg>
+      </button>
+      <button class="control apagado" id="musica" type="button" aria-label="Poner música" title="Poner música">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>
+          <path class="tachado" d="M3 3l18 18"/>
+        </svg>
+      </button>
+    </div>
+    <p class="pista" aria-hidden="true">toca la pantalla para soltar pétalos</p>
+
+    <dialog class="crear" id="crear" aria-labelledby="crearTitulo">
+      <button class="crear__cerrar" id="cerrarCrear" type="button" aria-label="Cerrar">&times;</button>
+      <h2 id="crearTitulo">Crea tu propio ramo</h2>
+      <p class="crear__ayuda">Escribe para quién es y tu mensaje, te armo un enlace para mandárselo.</p>
+      <label for="campoPara">Para</label>
+      <input id="campoPara" maxlength="40" autocomplete="off" placeholder="Su nombre" />
+      <label for="campoDe">De</label>
+      <input id="campoDe" maxlength="40" autocomplete="off" placeholder="Tu nombre" />
+      <label for="campoMensaje">Mensaje</label>
+      <textarea id="campoMensaje" maxlength="160" rows="3" placeholder="Unas flores amarillas para alegrarte el día"></textarea>
+      <p class="crear__cuenta" id="cuentaMensaje">0 / 160</p>
+      <label for="campoEnlace">Enlace</label>
+      <input class="crear__enlace" id="campoEnlace" readonly />
+      <div class="crear__acciones">
+        <button class="boton" id="copiar" type="button">Copiar enlace</button>
+        <button class="boton boton--suave" id="compartir" type="button" hidden>Compartir</button>
+      </div>
+      <p class="crear__aviso" id="avisoCrear" role="status"></p>
+    </dialog>
+
+    <script>
+      // el mensaje se arma con el enlace, por ejemplo ?para=Ana&de=Said&mensaje=Feliz cumple
+      // todo se pone como texto, asi nadie puede meter html por el enlace
+      const parametros = new URLSearchParams(location.search);
+      const leer = (clave, largo) => (parametros.get(clave) || '').trim().slice(0, largo);
+
+      const para = leer('para', 40);
+      const de = leer('de', 40) || 'Said';
+      const mensaje = leer('mensaje', 160) || 'Unas flores amarillas para alegrarte el día';
+
+      const intro = document.getElementById('intro');
+      const abrir = document.getElementById('abrir');
+      const texto = document.getElementById('texto');
+      const titulo = texto.parentElement;
+
+      document.getElementById('introTitulo').textContent = para ? 'Para ' + para : 'Para ti';
+      document.getElementById('introDe').textContent = 'de ' + de;
+      document.getElementById('para').textContent = para ? 'Para ' + para : '';
+      document.getElementById('firma').textContent = 'con cariño, ' + de;
+      if (para) document.title = 'Flores amarillas para ' + para;
+
+      const sinMovimiento = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function escribir(frase, alTerminar) {
+        if (sinMovimiento) {
+          texto.textContent = frase;
+          alTerminar();
+          return;
+        }
+        titulo.classList.add('escribiendo');
+        const letras = Array.from(frase);
+        let i = 0;
+        (function siguiente() {
+          texto.textContent = letras.slice(0, ++i).join('');
+          if (i < letras.length) {
+            // una pausita en las comas para que se lea como se dice
+            setTimeout(siguiente, /[,.!?]/.test(letras[i - 1]) ? 320 : 55);
+          } else {
+            setTimeout(() => titulo.classList.remove('escribiendo'), 1200);
+            alTerminar();
+          }
+        })();
+      }
+
+      function abrirCarta() {
+        intro.classList.add('cerrando');
+        document.body.classList.remove('esperando');
+        document.getElementById('para').classList.add('visible');
+        // el mensaje sale cuando ya van creciendo las flores
+        setTimeout(() => escribir(mensaje, () => document.getElementById('firma').classList.add('visible')), 1600);
+        setTimeout(() => intro.remove(), 1000);
+      }
+
+      abrir.addEventListener('click', abrirCarta, { once: true });
+      abrir.focus();
+
+      // el cielo va en un canvas encima de todo, sin recibir clics
+      // estrellas que titilan, luciernagas, una estrella fugaz de vez en cuando y petalos al tocar
+      const lienzo = document.getElementById('cielo');
+      const ctx = lienzo.getContext('2d');
+      let ancho = 0, alto = 0, dpr = 1;
+      let estrellas = [], luciernagas = [], petalos = [], fugaz = null;
+
+      function medir() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        ancho = innerWidth;
+        alto = innerHeight;
+        lienzo.width = ancho * dpr;
+        lienzo.height = alto * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const cuantas = Math.round(ancho * alto / 9000);
+        estrellas = Array.from({ length: cuantas }, () => ({
+          x: Math.random() * ancho,
+          y: Math.random() * alto * 0.7,
+          r: Math.random() * 1.2 + 0.2,
+          fase: Math.random() * Math.PI * 2,
+          vel: Math.random() * 0.02 + 0.005
+        }));
+        luciernagas = Array.from({ length: ancho < 600 ? 14 : 26 }, nuevaLuciernaga);
+      }
+
+      function nuevaLuciernaga() {
+        return {
+          x: Math.random() * ancho,
+          y: alto * (0.35 + Math.random() * 0.6),
+          ang: Math.random() * Math.PI * 2,
+          vel: Math.random() * 0.35 + 0.15,
+          fase: Math.random() * Math.PI * 2
+        };
+      }
+
+      function soltarPetalos(x, y, cuantos) {
+        for (let i = 0; i < cuantos; i++) {
+          const ang = Math.random() * Math.PI * 2;
+          const fuerza = Math.random() * 3 + 1;
+          petalos.push({
+            x, y,
+            vx: Math.cos(ang) * fuerza,
+            vy: Math.sin(ang) * fuerza - 2,
+            giro: Math.random() * Math.PI,
+            vgiro: (Math.random() - 0.5) * 0.2,
+            tam: Math.random() * 5 + 5,
+            vida: 1,
+            tono: 44 + Math.random() * 12
+          });
+        }
+        // que no se junten demasiados en un cel lento
+        if (petalos.length > 260) petalos.splice(0, petalos.length - 260);
+      }
+
+      function dibujarPetalo(p) {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.giro);
+        ctx.globalAlpha = Math.max(0, p.vida);
+        ctx.fillStyle = 'hsl(' + p.tono + ', 95%, 60%)';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, p.tam, p.tam * 0.55, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function cuadro() {
+        ctx.clearRect(0, 0, ancho, alto);
+
+        for (const e of estrellas) {
+          e.fase += e.vel;
+          ctx.globalAlpha = 0.25 + Math.abs(Math.sin(e.fase)) * 0.75;
+          ctx.fillStyle = '#e8fbff';
+          ctx.beginPath();
+          ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        if (!fugaz && Math.random() < 0.0025) {
+          fugaz = { x: Math.random() * ancho * 0.8, y: Math.random() * alto * 0.3, largo: 0, vida: 1 };
+        }
+        if (fugaz) {
+          fugaz.largo = Math.min(fugaz.largo + 14, 160);
+          fugaz.x += 9;
+          fugaz.y += 4;
+          fugaz.vida -= 0.018;
+          const cola = ctx.createLinearGradient(fugaz.x, fugaz.y, fugaz.x - fugaz.largo, fugaz.y - fugaz.largo * 0.45);
+          cola.addColorStop(0, 'rgba(255,255,255,' + Math.max(0, fugaz.vida) + ')');
+          cola.addColorStop(1, 'rgba(255,255,255,0)');
+          ctx.globalAlpha = 1;
+          ctx.strokeStyle = cola;
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.moveTo(fugaz.x, fugaz.y);
+          ctx.lineTo(fugaz.x - fugaz.largo, fugaz.y - fugaz.largo * 0.45);
+          ctx.stroke();
+          if (fugaz.vida <= 0) fugaz = null;
+        }
+
+        for (const l of luciernagas) {
+          l.ang += (Math.random() - 0.5) * 0.3;
+          l.x += Math.cos(l.ang) * l.vel;
+          l.y += Math.sin(l.ang) * l.vel * 0.6;
+          l.fase += 0.03;
+          if (l.x < -10) l.x = ancho + 10;
+          if (l.x > ancho + 10) l.x = -10;
+          if (l.y < alto * 0.25 || l.y > alto) l.ang += Math.PI;
+          const brillo = 0.35 + Math.abs(Math.sin(l.fase)) * 0.65;
+          const halo = ctx.createRadialGradient(l.x, l.y, 0, l.x, l.y, 9);
+          halo.addColorStop(0, 'rgba(255, 236, 120,' + brillo + ')');
+          halo.addColorStop(1, 'rgba(255, 220, 80, 0)');
+          ctx.globalAlpha = 1;
+          ctx.fillStyle = halo;
+          ctx.beginPath();
+          ctx.arc(l.x, l.y, 9, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        for (const p of petalos) {
+          p.vy += 0.06;
+          p.vx *= 0.99;
+          p.x += p.vx + Math.sin(p.giro) * 0.4;
+          p.y += p.vy * 0.6;
+          p.giro += p.vgiro;
+          p.vida -= 0.006;
+          dibujarPetalo(p);
+        }
+        petalos = petalos.filter(p => p.vida > 0 && p.y < alto + 20);
+
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(cuadro);
+      }
+
+      medir();
+      addEventListener('resize', medir);
+      if (!sinMovimiento) requestAnimationFrame(cuadro);
+
+      // tocar la pantalla suelta petalos, ya con la carta abierta
+      addEventListener('pointerdown', e => {
+        if (document.body.classList.contains('esperando') || e.target.closest('button, a, input, textarea, dialog')) return;
+        soltarPetalos(e.clientX, e.clientY, 18);
+      });
+
+      // volver a florecer, al poner otra vez el ramo las animaciones empiezan desde cero
+      document.getElementById('reflorecer').addEventListener('click', () => {
+        const ramo = document.querySelector('.flowers');
+        ramo.replaceWith(ramo.cloneNode(true));
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => soltarPetalos(ancho / 2 + (Math.random() - 0.5) * 200, alto * 0.45, 14), i * 180);
+        }
+      });
+
+      // musica de cajita hecha con web audio, sin archivos ni derechos de autor
+      const musica = (() => {
+        let audio = null, maestro = null, sonando = false, siguienteNota = 0, paso = 0, reloj = null;
+        // escala pentatonica de do, asi cualquier nota suena bonita con la otra
+        const melodia = [72, 76, 79, 84, 81, 79, 76, 79, 72, 74, 76, 79, 77, 76, 74, 72];
+        const bajo = [48, 48, 55, 55, 53, 53, 52, 55];
+        const frecuencia = n => 440 * Math.pow(2, (n - 69) / 12);
+
+        function nota(n, cuando, duracion, volumen) {
+          const osc = audio.createOscillator();
+          const env = audio.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = frecuencia(n);
+          env.gain.setValueAtTime(0, cuando);
+          env.gain.linearRampToValueAtTime(volumen, cuando + 0.01);
+          env.gain.exponentialRampToValueAtTime(0.0001, cuando + duracion);
+          osc.connect(env).connect(maestro);
+          osc.start(cuando);
+          osc.stop(cuando + duracion + 0.05);
+        }
+
+        // se programan las notas un poquito adelante, asi no se traba aunque el cel este ocupado
+        function programar() {
+          while (siguienteNota < audio.currentTime + 0.4) {
+            nota(melodia[paso % melodia.length], siguienteNota, 1.6, 0.16);
+            if (paso % 2 === 0) nota(bajo[(paso / 2) % bajo.length], siguienteNota, 2.4, 0.07);
+            siguienteNota += 0.42;
+            paso++;
+          }
+        }
+
+        function iniciar() {
+          if (!audio) {
+            audio = new (window.AudioContext || window.webkitAudioContext)();
+            maestro = audio.createGain();
+            const eco = audio.createDelay();
+            const retorno = audio.createGain();
+            eco.delayTime.value = 0.28;
+            retorno.gain.value = 0.3;
+            maestro.connect(audio.destination);
+            maestro.connect(eco);
+            eco.connect(retorno).connect(eco);
+            retorno.connect(audio.destination);
+          }
+          audio.resume();
+          maestro.gain.setTargetAtTime(0.5, audio.currentTime, 0.5);
+          siguienteNota = audio.currentTime + 0.1;
+          reloj = setInterval(programar, 100);
+          sonando = true;
+        }
+
+        function parar() {
+          clearInterval(reloj);
+          if (maestro) maestro.gain.setTargetAtTime(0, audio.currentTime, 0.2);
+          sonando = false;
+        }
+
+        return { iniciar, parar, get sonando() { return sonando; } };
+      })();
+
+      const botonMusica = document.getElementById('musica');
+      function pintarMusica() {
+        botonMusica.classList.toggle('apagado', !musica.sonando);
+        botonMusica.setAttribute('aria-label', musica.sonando ? 'Quitar la música' : 'Poner música');
+        botonMusica.title = botonMusica.getAttribute('aria-label');
+      }
+      botonMusica.addEventListener('click', () => {
+        musica.sonando ? musica.parar() : musica.iniciar();
+        pintarMusica();
+        try { localStorage.setItem('flores-musica', musica.sonando ? 'si' : 'no'); } catch (e) {}
+      });
+      abrir.addEventListener('click', () => {
+        let quiere = 'si';
+        try { quiere = localStorage.getItem('flores-musica') || 'si'; } catch (e) {}
+        if (quiere === 'si') musica.iniciar();
+        pintarMusica();
+        document.getElementById('controles').classList.add('visible');
+        setTimeout(() => soltarPetalos(ancho / 2, alto * 0.4, 30), 5200);
+      }, { once: true });
+
+      // sin movimiento el cielo queda quieto, solo se pintan las estrellas una vez
+      if (sinMovimiento) {
+        for (const e of estrellas) {
+          ctx.globalAlpha = 0.4 + Math.random() * 0.6;
+          ctx.fillStyle = '#e8fbff';
+          ctx.beginPath();
+          ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      // se mide el ramo ya crecido en una copia escondida y se achica lo justo para que quepa bajo el mensaje
+      function ajustarRamo() {
+        const ramo = document.querySelector('.flowers');
+        const encabezado = document.querySelector('.mensaje');
+        const escrito = texto.textContent;
+        texto.textContent = mensaje;
+        const techo = encabezado.getBoundingClientRect().bottom + 14;
+        texto.textContent = escrito;
+
+        // la copia va encima del original, en el mismo lugar y del mismo tamaño
+        const base = ramo.getBoundingClientRect();
+        const copia = ramo.cloneNode(true);
+        copia.style.cssText = 'visibility:hidden;position:fixed;margin:0;transition:none;--escala:1;pointer-events:none' +
+          ';left:' + base.left + 'px;top:' + base.top + 'px;width:' + base.width + 'px;height:' + base.height + 'px';
+        copia.setAttribute('aria-hidden', 'true');
+        document.body.append(copia);
+        // las que se repiten siempre no se pueden terminar, esas se quitan
+        copia.getAnimations({ subtree: true }).forEach(a => {
+          try { a.finish(); } catch (e) { a.cancel(); }
+        });
+        let arriba = Infinity, abajo = 0;
+        copia.querySelectorAll('.flower__leaf').forEach(el => { arriba = Math.min(arriba, el.getBoundingClientRect().top); });
+        copia.querySelectorAll('.flower__line').forEach(el => { abajo = Math.max(abajo, el.getBoundingClientRect().bottom); });
+        copia.remove();
+        if (!isFinite(arriba) || abajo <= arriba) return;
+
+        const escala = Math.max(0.5, Math.min(1, (abajo - techo) / (abajo - arriba)));
+        ramo.style.transformOrigin = '50% ' + Math.round(abajo - base.top) + 'px';
+        ramo.style.setProperty('--escala', escala.toFixed(3));
+      }
+
+      ajustarRamo();
+      let esperaMedida = null;
+      addEventListener('resize', () => {
+        clearTimeout(esperaMedida);
+        esperaMedida = setTimeout(ajustarRamo, 150);
+      });
+      if (document.fonts) document.fonts.ready.then(ajustarRamo);
+
+      // al reflorecer el ramo nuevo tambien lleva su tamaño
+      document.getElementById('reflorecer').addEventListener('click', ajustarRamo);
+
+      // armar un enlace con otro nombre y otro mensaje para mandarselo a alguien
+      const crear = document.getElementById('crear');
+      const campos = {
+        para: document.getElementById('campoPara'),
+        de: document.getElementById('campoDe'),
+        mensaje: document.getElementById('campoMensaje')
+      };
+      const enlace = document.getElementById('campoEnlace');
+      const avisoCrear = document.getElementById('avisoCrear');
+      const cuenta = document.getElementById('cuentaMensaje');
+      const botonCompartir = document.getElementById('compartir');
+
+      function armarEnlace() {
+        const datos = new URLSearchParams();
+        for (const [clave, campo] of Object.entries(campos)) {
+          const valor = campo.value.trim();
+          if (valor) datos.set(clave, valor);
+        }
+        const base = location.href.split(/[?#]/)[0];
+        const consulta = datos.toString();
+        enlace.value = consulta ? base + '?' + consulta : base;
+        cuenta.textContent = campos.mensaje.value.length + ' / 160';
+        avisoCrear.textContent = '';
+      }
+
+      // la primera vez se llena con lo del enlace, despues se respeta lo que ya escribiste
+      let yaLleno = false;
+      document.getElementById('abrirCrear').addEventListener('click', () => {
+        if (!yaLleno) {
+          campos.para.value = para;
+          campos.de.value = parametros.get('de') ? de : '';
+          campos.mensaje.value = parametros.get('mensaje') ? mensaje : '';
+          yaLleno = true;
+        }
+        armarEnlace();
+        crear.showModal();
+        campos.para.focus();
+      });
+      document.getElementById('cerrarCrear').addEventListener('click', () => crear.close());
+      // tocar fuera del panel tambien lo cierra
+      crear.addEventListener('click', e => { if (e.target === crear) crear.close(); });
+      Object.values(campos).forEach(c => c.addEventListener('input', armarEnlace));
+
+      document.getElementById('copiar').addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(enlace.value);
+        } catch (e) {
+          enlace.select();
+          document.execCommand('copy');
+        }
+        avisoCrear.textContent = 'Enlace copiado, ya lo puedes pegar donde quieras';
+      });
+
+      if (navigator.share) {
+        botonCompartir.hidden = false;
+        botonCompartir.addEventListener('click', () => {
+          const nombre = campos.para.value.trim();
+          navigator.share({
+            title: 'Flores amarillas',
+            text: nombre ? 'Unas flores amarillas para ' + nombre : 'Unas flores amarillas para ti',
+            url: enlace.value
+          }).catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>
-
-
-<!-- Pull Shark test 1--------->
-
-
-
-
-<!-- Pull Shark test 2--------->
