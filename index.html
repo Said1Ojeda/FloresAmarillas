@@ -4,7 +4,12 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dev. said - Flores amarillas</title>
+    <title>Flores amarillas</title>
+    <meta name="description" content="Un ramo de flores amarillas que crece en pantalla, con un mensaje para alguien especial." />
+    <meta name="theme-color" content="#0b1114" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
     <style>
       *,
 *::after,
@@ -32,28 +37,6 @@ body {
   overflow: hidden;
 }
 
-
-.titulo {
-  margin-bottom: 180px;
-  color: whitesmoke;
-  position: absolute;
-  top: 20px; 
-  left: 50%;
-  transform: translateX(-50%); 
-  width: 80%;
-  font-size: 3vh;
-  opacity: 0;
-  animation: fadeIn 4s ease-in-out forwards;
-  text-align: center;
-}
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
 
 .night {
   z-index: -1;
@@ -1601,53 +1584,213 @@ body {
   }
 }
 
-body, h1, p {
-  margin: 0;
-  padding: 0;
+/* mientras la carta esta cerrada las flores esperan, al abrirla crecen desde cero */
+body.esperando .flowers,
+body.esperando .flowers * {
+  animation-play-state: paused !important;
 }
 
 body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f7f7f7;
-  color: #333;
+  font-family: 'Poppins', system-ui, sans-serif;
+  color: #f5f5f5;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+/* el mensaje de arriba, se escribe letra por letra */
+.mensaje {
+  position: absolute;
+  top: clamp(16px, 5vh, 48px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(92vw, 760px);
+  text-align: center;
+  z-index: 20;
+  pointer-events: none;
 }
 
-h1 {
-  font-size: 2em;
-  line-height: 1.5;
-  margin-bottom: 20px;
+.mensaje__para {
+  font-size: clamp(.8rem, 2.2vw, 1rem);
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: rgba(255, 236, 153, .8);
+  opacity: 0;
+  transition: opacity 1.2s ease;
 }
 
-@media screen and (max-width: 600px) {
-  h1 {
-      font-size: 1.5em;
+.mensaje__texto {
+  margin-top: .3em;
+  font-family: 'Dancing Script', cursive;
+  font-weight: 700;
+  font-size: clamp(1.7rem, 5.2vw, 3.2rem);
+  line-height: 1.2;
+  color: #fff6d5;
+  text-shadow: 0 0 18px rgba(255, 214, 64, .45), 0 2px 6px rgba(0, 0, 0, .6);
+  min-height: 1.2em;
+}
+
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: .9em;
+  margin-left: 4px;
+  vertical-align: -0.08em;
+  background: #ffd84a;
+  opacity: 0;
+}
+
+.escribiendo .cursor {
+  opacity: 1;
+  animation: parpadeo .8s steps(1) infinite;
+}
+
+@keyframes parpadeo {
+  50% { opacity: 0; }
+}
+
+.mensaje__firma {
+  margin-top: .6em;
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(1rem, 2.6vw, 1.4rem);
+  color: rgba(255, 246, 213, .75);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 1.2s ease, transform 1.2s ease;
+}
+
+.visible {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* la carta de entrada */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(ellipse at center, rgba(20, 30, 34, .92), rgba(0, 0, 0, .97));
+  backdrop-filter: blur(6px);
+  transition: opacity .9s ease, visibility .9s ease;
+}
+
+.intro.cerrando {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.carta {
+  position: relative;
+  width: min(88vw, 380px);
+  padding: 56px 28px 32px;
+  border-radius: 22px;
+  text-align: center;
+  background: linear-gradient(160deg, #fffaf0, #fbefd2);
+  color: #3a2f1d;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .6), 0 0 0 1px rgba(255, 255, 255, .5) inset;
+  animation: carta-entra 1s cubic-bezier(.2, .9, .3, 1.2) both;
+}
+
+@keyframes carta-entra {
+  from { opacity: 0; transform: translateY(30px) scale(.94); }
+}
+
+.carta__sello {
+  position: absolute;
+  top: -26px;
+  left: 50%;
+  width: 52px;
+  height: 52px;
+  margin-left: -26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffe680, #f2b705 60%, #c98a00);
+  box-shadow: 0 6px 18px rgba(242, 183, 5, .55);
+}
+
+/* cinco petalos en el sello, hechos con sombras de un circulo */
+.carta__sello::after {
+  content: '';
+  position: absolute;
+  inset: 18px;
+  border-radius: 50%;
+  background: #8a5a00;
+  box-shadow: 0 -9px 0 1px #fff3b0, 8.5px -3px 0 1px #fff3b0, 5px 7.5px 0 1px #fff3b0,
+              -5px 7.5px 0 1px #fff3b0, -8.5px -3px 0 1px #fff3b0;
+}
+
+.carta__aviso {
+  font-size: .78rem;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: #a07c2c;
+}
+
+.carta__titulo {
+  margin: .25em 0 .1em;
+  font-family: 'Dancing Script', cursive;
+  font-size: 2.6rem;
+  line-height: 1.1;
+  word-break: break-word;
+}
+
+.carta__de {
+  min-height: 1.4em;
+  font-size: .95rem;
+  color: #7a6640;
+}
+
+.boton {
+  margin-top: 22px;
+  padding: 12px 34px;
+  border: 0;
+  border-radius: 999px;
+  font: 600 1rem 'Poppins', system-ui, sans-serif;
+  color: #3a2a00;
+  background: linear-gradient(180deg, #ffe066, #f4b400);
+  box-shadow: 0 10px 24px rgba(244, 180, 0, .45);
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.boton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(244, 180, 0, .55);
+}
+
+.boton:active {
+  transform: translateY(1px);
+}
+
+.boton:focus-visible {
+  outline: 3px solid #fff3b0;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carta,
+  .escribiendo .cursor {
+    animation: none;
   }
 }
-
-@media screen and (min-width: 601px) and (max-width: 1024px) {
-  h1 {
-      font-size: 1.8em;
-  }
-}
-
-@media screen and (min-width: 1025px) {
-  h1 {
-      font-size: 2em;
-  }
-}
-
 
     </style>
   </head>
-  <body class="container">
-    <h1 class="titulo">
-      Text Said</h1>
+  <body class="esperando">
+    <header class="mensaje" aria-live="polite">
+      <p class="mensaje__para" id="para"></p>
+      <h1 class="mensaje__texto"><span id="texto"></span><span class="cursor" aria-hidden="true"></span></h1>
+      <p class="mensaje__firma" id="firma"></p>
+    </header>
+
+    <div class="intro" id="intro" role="dialog" aria-labelledby="introTitulo">
+      <div class="carta">
+        <div class="carta__sello" aria-hidden="true"></div>
+        <p class="carta__aviso">Te llegó algo</p>
+        <h2 class="carta__titulo" id="introTitulo">Para ti</h2>
+        <p class="carta__de" id="introDe"></p>
+        <button class="boton" id="abrir" type="button">Abrir</button>
+      </div>
+    </div>
   
     <div class="night"></div>
     <div class="flowers">
@@ -1959,13 +2102,61 @@ h1 {
         </div>
       </div>
     </div>
+    <script>
+      // el mensaje se arma con el enlace, por ejemplo ?para=Ana&de=Said&mensaje=Feliz cumple
+      // todo se pone como texto, asi nadie puede meter html por el enlace
+      const parametros = new URLSearchParams(location.search);
+      const leer = (clave, largo) => (parametros.get(clave) || '').trim().slice(0, largo);
+
+      const para = leer('para', 40);
+      const de = leer('de', 40) || 'Said';
+      const mensaje = leer('mensaje', 160) || 'Unas flores amarillas para alegrarte el día';
+
+      const intro = document.getElementById('intro');
+      const abrir = document.getElementById('abrir');
+      const texto = document.getElementById('texto');
+      const titulo = texto.parentElement;
+
+      document.getElementById('introTitulo').textContent = para ? 'Para ' + para : 'Para ti';
+      document.getElementById('introDe').textContent = 'de ' + de;
+      document.getElementById('para').textContent = para ? 'Para ' + para : '';
+      document.getElementById('firma').textContent = 'con cariño, ' + de;
+      if (para) document.title = 'Flores amarillas para ' + para;
+
+      const sinMovimiento = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function escribir(frase, alTerminar) {
+        if (sinMovimiento) {
+          texto.textContent = frase;
+          alTerminar();
+          return;
+        }
+        titulo.classList.add('escribiendo');
+        const letras = Array.from(frase);
+        let i = 0;
+        (function siguiente() {
+          texto.textContent = letras.slice(0, ++i).join('');
+          if (i < letras.length) {
+            // una pausita en las comas para que se lea como se dice
+            setTimeout(siguiente, /[,.!?]/.test(letras[i - 1]) ? 320 : 55);
+          } else {
+            setTimeout(() => titulo.classList.remove('escribiendo'), 1200);
+            alTerminar();
+          }
+        })();
+      }
+
+      function abrirCarta() {
+        intro.classList.add('cerrando');
+        document.body.classList.remove('esperando');
+        document.getElementById('para').classList.add('visible');
+        // el mensaje sale cuando ya van creciendo las flores
+        setTimeout(() => escribir(mensaje, () => document.getElementById('firma').classList.add('visible')), 1600);
+        setTimeout(() => intro.remove(), 1000);
+      }
+
+      abrir.addEventListener('click', abrirCarta, { once: true });
+      abrir.focus();
+    </script>
   </body>
 </html>
-
-
-<!-- Pull Shark test 1--------->
-
-
-
-
-<!-- Pull Shark test 2--------->
